@@ -1,3 +1,5 @@
+import logging
+
 '''
 function: getIntensities(gtcDir, bpm, outDir)
 description:

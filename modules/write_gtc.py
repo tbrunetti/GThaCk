@@ -1,6 +1,10 @@
 from IlluminaBeadArrayFiles import GenotypeCalls, BeadArrayUtility
 import struct
 from io import BytesIO
+import logging
+
+logger = logging.getLogger('write_gtc')
+logger.debug('In module write_gtc.py')
 
 def handle_int(value):
     return struct.pack("<i", value)
@@ -84,6 +88,7 @@ list_types.append(GenotypeCalls._GenotypeCalls__ID_LOGR_RATIOS)
 
 
 def write_gtc(data, handle):
+    logging.debug('In sub-method of write_gtc.py, write_gtc(data, handle)')
     handle.write(b'g')
     handle.write(b't')
     handle.write(b'c')
