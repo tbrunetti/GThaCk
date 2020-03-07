@@ -6,16 +6,24 @@ import sys
 import logging
 
 '''
-function: manipulate_gtc(bpm, gtcDir, snpsToUpdate, outDir)
+function: manipulate_gtc(self)
 description:
 input:
 output:
 '''
-def manipulate_gtc(bpm, gtcDir, outDir, snpsToUpdate, overrides):
+def manipulate_gtc(self):
     import extractInformation
     import write_gtc
     logger = logging.getLogger('manipulate_gtc')
     logger.debug('In method manipulate_gtc()')
+    
+    bpm=self.bpm
+    gtcDir=self.gtcDir
+    outDir=self.outDir
+    snpsToUpdate=self.snpUpdateFile
+    overrides=self.overrides
+
+
     '''
     function: updateMetaData(data, metaData)
     description:
@@ -144,22 +152,38 @@ def manipulate_gtc(bpm, gtcDir, outDir, snpsToUpdate, overrides):
     input:
     output:
     '''
-    def snpOverride():
-        pass
+    def snpOverride(manifest, overrides):
+        logger = logging.getLogger('snpOverride')
+        logger.debug('Opening snp override file...')
+        
+        with open(overrides, 'r') as snpsOverrides:
+            for snp in snpsOverrides:
+                snp = snp.split('\t')
+                try:
+                    logger.info('snp {} is being changed from {} to {}'.format(snp[0], manifest.snps[manifest.names.index(snp[0])], snp[1]))
+                    manifest.snps[manifest.names.index(snp[0])] = snp[1]
+                    logger.info('Success! Alleles of snp {} has been updated!'.format(snp[0]))
+                except ValueError:
+                    logger.error('Error! snp {} cannot be updated! Please check your input override file format.'.format(snp[0]))
+
+        return manifest
     
 
 ###################################################################################################################
 ############### First analytic lines processed in manipulate_gtc(bpm, gtcDir, outDir, snpsToUpdate) ###############
 ###################################################################################################################
-
+    logger.debug('Preparing to read in bpm file...')
     manifest = BeadPoolManifest(bpm)
+    logger.debug('Successfully loaded BPM file')
 
-
-    ##########################
-    #TODO manifest overrides!#
-    ##########################
-    manifest.snps[manifest.names.index('rs12248560.1')] = '[T/C]'  # known mistake in bpm
-    manifest.snps[manifest.names.index('newrs4986893')] = '[A/G]' # bpm strand flipping issue
+    #######################
+    # manifest overrides! #
+    #######################
+    if overrides == None:
+        logger.debug('No overrides present')
+    else:
+        logger.debug('Override file present')
+        manifest = snpOverride(manifest=manifest, overrides=overrides)
     
     gtc = ''
     total_gtcs = 0
