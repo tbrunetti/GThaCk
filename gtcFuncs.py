@@ -15,6 +15,7 @@ class GtcFunctions:
 
         logger.debug('New object initialized')
 
+    
     def manipulateUpdate(self, snpUpdateFile, overrides):
         import manipulateGTC
         
@@ -23,7 +24,7 @@ class GtcFunctions:
 
         self.snpUpdateFile = snpUpdateFile
         self.overrides = overrides
-        manipulateGTC.manipulate_gtc(bpm=self.bpm, gtcDir=self.gtcDir, outDir=self.outDir, snpsToUpdate=self.snpUpdateFile, overrides=self.overrides)
+        manipulateGTC.manipulate_gtc(self)
 
    
     def extractSampleInfo(self):
@@ -38,7 +39,8 @@ class GtcFunctions:
 
         logger = logging.getLogger('getIntensities')
         logger.debug('Running module: getIntensities')
-
+        getIntensities.getIntensities(self)
+    
     
     def getCallperSample(self):
         logger = logging.getLogger('getCallperSample')
