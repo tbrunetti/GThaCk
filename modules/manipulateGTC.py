@@ -12,6 +12,7 @@ output:
 '''
 def manipulate_gtc(bpm, gtcDir, outDir, snpsToUpdate):
     import extractInformation
+    import write_gtc
     '''
     function: updateMetaData(data, metaData)
     description:
@@ -96,6 +97,7 @@ def manipulate_gtc(bpm, gtcDir, outDir, snpsToUpdate):
 
     def validateUpdate(originalGTC, outputName, outDir):
         import extractInformation
+        import write_gtc
 
         original_genotype = GenotypeCalls(originalGTC)
         gtc_copy = GenotypeCalls(os.path.join(outDir,
