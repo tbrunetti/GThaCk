@@ -88,7 +88,7 @@ list_types.append(GenotypeCalls._GenotypeCalls__ID_LOGR_RATIOS)
 
 
 def write_gtc(data, handle):
-    logging.debug('In sub-method of write_gtc.py, write_gtc(data, handle)')
+    logger.debug('In sub-method of write_gtc.py, write_gtc(data, handle)')
     handle.write(b'g')
     handle.write(b't')
     handle.write(b'c')
@@ -106,6 +106,8 @@ def write_gtc(data, handle):
 
         # write the data into the buffer
         if toc_id in list_types:
+            print("toc_id in loop")
+            print(toc_id)
             handle.write(handle_int(offset + buffer.tell()))
             buffer.write(handle_int(len(data[toc_id])))
             for element in data[toc_id]:

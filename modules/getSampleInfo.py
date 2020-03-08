@@ -1,3 +1,5 @@
+import os
+from IlluminaBeadArrayFiles import *
 
 '''
 function: getSampleInfo(bpm, gtcDir, outDir)

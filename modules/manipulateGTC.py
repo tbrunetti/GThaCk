@@ -40,13 +40,13 @@ def manipulate_gtc(self):
         metaDataUpdates = metaData.rstrip().split(',')
         for update in metaDataUpdates:
             if update.rstrip().split('=')[0] == 'sampleName':
-                dataDict[10] = update.rstrip().split('=')[1]
+                dataDict[10] = update.rstrip().split('=')[1].encode()
             elif update.rstrip().split('=')[0] == 'sentrixBarcode':
-                dataDict[1016] = update.rstrip().split('=')[1]
+                dataDict[1016] = update.rstrip().split('=')[1].encode()
             elif update.rstrip().split('=')[0] == 'plateName':
-                dataDict[11] = update.rstrip().split('=')[1]
+                dataDict[11] = update.rstrip().split('=')[1].encode()
             elif update.rstrip().split('=')[0] == 'well':
-                dataDict[12] = update.rstrip().split('=')[1]
+                dataDict[12] = update.rstrip().split('=')[1].encode()
             else:
                 logger.warning(
                     'MetaData {} does not exist; please make sure spelling is correct and case sensitive!  Ignoring...'
@@ -73,14 +73,14 @@ def manipulate_gtc(self):
         
         loc = manifest.names.index(line.rstrip().split()[0])
         originalSnp = data[1003][loc]
-        data[1003][loc] = str(line.rstrip().split()[1])
+        data[1003][loc] = str(line.rstrip().split()[1]).encode()
         if ((str(line.rstrip().split()[1])[0] != str(line.rstrip().split()[1])[1]) and (str(line.rstrip().split()[1])[0] != '-')):
             data[1002][loc] = 2
         elif (str(line.rstrip().split()[1])[0] == '-') and (str(line.rstrip().split()[1])[1] == '-'):
             data[1002][loc] = 0
         elif (str(line.rstrip().split()[1])[0] == str(line.rstrip().split()[1])[1]) and (str(line.rstrip().split()[1])[0] in ['A', 'T', 'G', 'C']) and (str(line.rstrip().split()[1])[1] in ['A', 'T', 'G', 'C']):
-            if manifest.snps[loc].find(str(line.rstrip().split()[1])[0]) != -1:
-                data[1002][loc] = manifest.snps[loc].find(str(line.rstrip().split()[1])[0])
+            if manifest.snps[loc].decode().find(str(line.rstrip().split()[1])[0]) != -1:
+                data[1002][loc] = manifest.snps[loc].decode().find(str(line.rstrip().split()[1])[0])
             else:
                 logger.warning('WARNING! {} allele possibilities do not match manifest.  {}={} and manifest={}. This snp will not be updated.'
                     .format(line.rstrip().split()[0],
@@ -120,7 +120,6 @@ def manipulate_gtc(self):
             assert gtc_copy.get_autocall_date() == original_genotype.get_autocall_date()
             assert gtc_copy.get_autocall_version() == original_genotype.get_autocall_version()
             #assert gtc_copy.get_base_calls() == genotype_calls.get_base_calls() -- do not activate, will def fail if snps are changed
-            assert gtc_copy.get_call_rate() == original_genotype.get_call_rate()
             assert gtc_copy.get_cluster_file() == original_genotype.get_cluster_file()
             assert (gtc_copy.get_control_x_intensities() ==original_genotype.get_control_x_intensities()).all()
             assert (gtc_copy.get_control_y_intensities() ==original_genotype.get_control_y_intensities()).all()
@@ -132,7 +131,6 @@ def manipulate_gtc(self):
             assert (gtc_copy.get_raw_x_intensities() == original_genotype.get_raw_x_intensities()).all()
 
             all_genotypes = gtc_copy.get_genotypes()
-
             assert len(manifest.names) == len(all_genotypes)
             assert len(manifest.names) == len(gtc_copy.get_logr_ratios())
             assert len(manifest.names) == len(gtc_copy.get_ballele_freqs())
@@ -160,8 +158,8 @@ def manipulate_gtc(self):
             for snp in snpsOverrides:
                 snp = snp.split('\t')
                 try:
-                    logger.info('snp {} is being changed from {} to {}'.format(snp[0], manifest.snps[manifest.names.index(snp[0])], snp[1]))
-                    manifest.snps[manifest.names.index(snp[0])] = snp[1]
+                    logger.info('snp {} is being changed from {} to {}'.format(snp[0], manifest.snps[manifest.names.index(snp[0])].decode(), snp[1]))
+                    manifest.snps[manifest.names.index(snp[0])] = snp[1].strip().encode()
                     logger.info('Success! Alleles of snp {} has been updated!'.format(snp[0]))
                 except ValueError:
                     logger.error('Error! snp {} cannot be updated! Please check your input override file format.'.format(snp[0]))

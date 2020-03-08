@@ -1,4 +1,6 @@
+from IlluminaBeadArrayFiles import *
 import logging
+
 
 '''
 function: getIntensities(gtcDir, bpm, outDir)
@@ -6,7 +8,11 @@ description:
 input:
 output:
 '''
-def getIntensities(gtcDir, bpm, outDir):
+def getIntensities(self):
+
+    gtcDir = self.gtcDir
+    bpm = self.bpm
+    outDir = self.outDir
 
     # SOMEWHERE NEED TO CALL METHOD: extractionInformation.py
     # reading in manifest more than once carries lot of overhead

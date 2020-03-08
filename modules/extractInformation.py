@@ -12,7 +12,6 @@ output:
 def getGtcInfo(gtc):
     data = {}
     genotype_calls = GenotypeCalls(gtc)
-    print(genotype_calls)
     
     data[
         GenotypeCalls.
