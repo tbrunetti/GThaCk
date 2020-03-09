@@ -21,6 +21,7 @@ class GtcFunctions:
         
         logger = logging.getLogger('manipulateGTC')
         logger.debug('Running module: manipulateGTC')
+        print('Running module: manipulateGTC')
 
         self.snpUpdateFile = snpUpdateFile
         self.overrides = overrides
@@ -32,6 +33,7 @@ class GtcFunctions:
         
         logger = logging.getLogger('extractSampleInfo')
         logger.debug('Running module: extractSampleInfo')
+        print('Running module: extractSampleInfo')
 
     
     def getIntensities(self):
@@ -39,12 +41,15 @@ class GtcFunctions:
 
         logger = logging.getLogger('getIntensities')
         logger.debug('Running module: getIntensities')
+        print('Running module: getIntensities')
+        
         getIntensities.getIntensities(self)
     
     
     def getCallperSample(self):
         logger = logging.getLogger('getCallperSample')
         logger.debug('Running module: getCallperSample')
+        print('Running module: getCallperSample')
 
 
 
@@ -62,7 +67,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if os.path.isdir(args.outDir) == False:
-        print('Output directory {} does not exists'.format(args.outDir))
+        print('\nOutput directory {} does not exists'.format(args.outDir))
         
         try:
             print('Attempting to create new output directory {}'.format(args.outDir))
@@ -72,7 +77,7 @@ if __name__ == '__main__':
             logger = logging.getLogger('Initialization')
 
         except:
-            print('Please check path for --outDir argument')
+            print('\n Please check path for --outDir argument')
             raise OSError('Error, problem with path {}. Please check path exists' % args.outDir)
             
     
@@ -80,8 +85,8 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename=os.path.join(args.outDir, args.logName))
         logger = logging.getLogger('Initialization')
         if any(files.endswith('.gtc') for files in os.listdir(args.outDir)):
-            logger.critical('output directory contains files with extensiion .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
-            print('output directory contains files with extensiion .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
+            logger.critical('Output directory contains files with extension .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
+            print('\nOutput directory contains files with extension .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
             sys.exit()
         logger.debug('Output directory can be used!')
 
