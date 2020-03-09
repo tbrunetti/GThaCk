@@ -4,11 +4,11 @@ from io import BytesIO
 
 '''
 function: getGtcInfo(gtc)
-description:
-input:
-output:
+description: extracts all data elements from a gtc file
+input: name of gtc file
+output: data dictionary of all elements of that gtc file
 '''
-
+@staticmethod
 def getGtcInfo(gtc):
     data = {}
     genotype_calls = GenotypeCalls(gtc)
