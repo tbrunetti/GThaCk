@@ -35,3 +35,26 @@ git clone https://github.com/tbrunetti/GThaCk.git
 
 ### Usage
 ----------
+Every function has the same 2 requirements: the bpm file and the directory of the location of the gtcs
+
+For help on all the options available and what they do, please run the following or see the table at the bottom of the page:
+```
+python3 gtcFuncs.py -h
+```
+
+
+**method: manipulateGTCs**
+The minimum command required to manipulate gtc files is the following:
+```
+python3 gtcFuncs.py manipulateGTCs --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --updates myUpdates.txt
+```
+An example of the format of myUpdates.txt can be see [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt) in [examples/example_gtcManipulationFile_input.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt)
+
+Another option that is available exclusively to the method manipulateGTCs is the `--override` argument.  If a snp call needs to be updated in the bpm it can be made using this argument using an overrides file.  This **does not** create an updated bpm file, it is merely used so that a gtc can pass validation due to misrepresentation of a wrong allele(s).  The bpm file is updated within the scope of the running program, however, it will not write out a new bpm, only the original bpm will persist.  An example of an override file can be seen [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt) in [examples/override.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt).
+
+
+**method: getIntensities**
+
+**method: sampleInformation**
+
+
