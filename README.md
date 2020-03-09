@@ -54,8 +54,8 @@ The minimum command required to manipulate gtc files is the following:
 ```
 python3 gtcFuncs.py manipulateGTCs --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --updates myUpdates.txt
 ```
-An example of the format of myUpdates.txt can be see [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt) in [examples/example_gtcManipulationFile_input.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt)  
-*  tab-delimited text file  
+An example of the format of myUpdates.txt can be see [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt) in [examples/example_gtcManipulationFile_input.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/example_gtcManipulationFile_input.txt)  **It must be a tab-delimited file!**  
+
 _For sample update and metadata line:_  
 *  first column = must start with the character ">" for each new sample directly followed by the name of the base gtc  
 *  second column = name of new gtc to be created  
