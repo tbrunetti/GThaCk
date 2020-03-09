@@ -47,6 +47,8 @@ def manipulate_gtc(self):
                 dataDict[11] = update.rstrip().split('=')[1].encode()
             elif update.rstrip().split('=')[0] == 'well':
                 dataDict[12] = update.rstrip().split('=')[1].encode()
+            elif update.rstrip().split('=')[0] == 'sex':
+                dataDict[1007] = update.rstrip().split('=')[1].encode()
             else:
                 logger.warning(
                     'MetaData {} does not exist; please make sure spelling is correct and case sensitive!  Ignoring...'
