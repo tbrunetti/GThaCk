@@ -105,7 +105,6 @@ def manipulate_gtc(self):
     input: requires the orginal gtc, the name of the new gtc, and the output directory
     output: None - Raises an AssertionError if a gtc fail validation and records in the log file and standard out
     '''
-    @staticmethod
     def validateUpdate(originalGTC, outputName, outDir):
         import extractInformation
         import write_gtc
@@ -151,7 +150,6 @@ def manipulate_gtc(self):
     input: bpm manifest and a text-file gathered at run time containing snps name and override value
     output: returns an ephemeral bpm manifest used during the duration of the run only
     '''
-    @staticmethod
     def snpOverride(manifest, overrides):
         logger = logging.getLogger('snpOverride')
         logger.debug('Opening snp override file...')
