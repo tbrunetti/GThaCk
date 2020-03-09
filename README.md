@@ -20,7 +20,8 @@ GThaCk is a program that allows users to extract all data contained a gtc file w
 ### Software Requirements and Dependencies
 ------------------------------------------
 *  Python >=3.6
-*  numpy
+*  numpy  
+*  pandas  
 *  IlluminaBeadArrayFiles
 	--note: This is the base of Illumina code forked from ..... however, I have modified it to be compatible with Python version 3.6 and updated the code with some updates to be compatible with GThaCk
 
@@ -74,8 +75,12 @@ Here is an example of how that would look like on the command line:
 python3 gtcFuncs.py manipulateGTCs --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --updates examples/example_gtcManipulationFile_input.txt --overrides examples/override.txt --outDir /path/to/output/Directory/
 ```
 
-**method: getIntensities**
 
-**method: sampleInformation**
+**method: createSampleSheet**  
+
+**method: getIntensities**  
+
+**method: sampleInformation**  
+
 
 
