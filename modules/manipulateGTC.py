@@ -7,9 +7,9 @@ import logging
 
 '''
 function: manipulate_gtc(self)
-description:
-input:
-output:
+description: wrapper method to update metadata, snps, validate them and convert to bytes for writing
+input: gtcFunction object
+output: writes updated gtcs to output directory specified at runtime
 '''
 def manipulate_gtc(self):
     import extractInformation
@@ -26,9 +26,9 @@ def manipulate_gtc(self):
 
     '''
     function: updateMetaData(data, metaData)
-    description:
-    input:
-    output:
+    description: update sample metadata (not snps) pertaining to sampleName, sentrixBarcode, plateName, well
+    input: data dictionary of a sample gtc and the metadata line pertaining to that sample
+    output: data dictionary with update information listed in meta data lines
     '''
     def updateMetaData(data, metaData):
         import itertools
@@ -63,9 +63,9 @@ def manipulate_gtc(self):
     
     '''
     function: snpUpdate(data, line)
-    description:
-    input:
-    output:
+    description: updates the snps in a gtc if the input text-file indicates a snp needs to be updated
+    input: data dictionary and a snp line in the text-file for the gtc sample
+    output: returns data dictionary for that sample with updated snp (update both base call in bytes and genotype)
     '''
     def snpUpdate(data, line):
         logger = logging.getLogger('snpUpdate')
@@ -101,10 +101,11 @@ def manipulate_gtc(self):
     
     '''
     function: validateUpdate(originalGTC, outputName, outDir)
-    description:
-    input:
-    output:
+    description: a function to validate the manipulated gtc against the original gtc it is based off
+    input: requires the orginal gtc, the name of the new gtc, and the output directory
+    output: None - Raises an AssertionError if a gtc fail validation and records in the log file and standard out
     '''
+    @staticmethod
     def validateUpdate(originalGTC, outputName, outDir):
         import extractInformation
         import write_gtc
@@ -146,10 +147,11 @@ def manipulate_gtc(self):
     
     '''
     function: snpOverride()
-    description:
-    input:
-    output:
+    description: will temporarily overwrite the original call in the bpm
+    input: bpm manifest and a text-file gathered at run time containing snps name and override value
+    output: returns an ephemeral bpm manifest used during the duration of the run only
     '''
+    @staticmethod
     def snpOverride(manifest, overrides):
         logger = logging.getLogger('snpOverride')
         logger.debug('Opening snp override file...')
