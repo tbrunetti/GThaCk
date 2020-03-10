@@ -27,14 +27,26 @@ class GtcFunctions:
         self.overrides = overrides
         manipulateGTC.manipulate_gtc(self)
 
+    def createSampleSheet(self, sampleSheetUpdates, fileOutName):
+        import sampleSheet
+
+        logger = logging.getLogger('createSampleSheet')
+        logger.debug('Running module: createSampleSheet')
+        print('Running module: createSampleSheet')
    
-    def extractSampleInfo(self):
+        self.sampleSheetUpdates = sampleSheetUpdates
+        
+        sampleSheet.baseData(self)
+        sampleSheet.updateHeader(self)
+        sampleSheet.generateSampleSheet(outDir = self.outDir, fileName = fileOutName)
+
+
+    def extractSampleInfo(self, sampleUpdates):
         import getSampleInfo
         
         logger = logging.getLogger('extractSampleInfo')
         logger.debug('Running module: extractSampleInfo')
         print('Running module: extractSampleInfo')
-
     
     def getIntensities(self):
         import getIntensities
@@ -56,14 +68,16 @@ class GtcFunctions:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Functions and methods for gtc files')
-    parser.add_argument('method', choices=['manipulateGTCs', 'getIntensities', 'sampleInformation'])
+    parser.add_argument('method', choices=['manipulateGTCs', 'getIntensities', 'sampleInformation', 'createSampleSheet'])
     parser.add_argument('--bpm', required=True, type=str, help='Full path to bead pool manifest file (.bpm); must be same one used to generate gtc')
     parser.add_argument('--gtcDir', type=str, default=os.getcwd(), help='Full path to location of directory/folder containing gtc files to process (files must end in .gtc)')
     parser.add_argument('--outDir', default=os.getcwd(), type=str,help='Full path to directory or folder to output results.  If it path does not exist, program will attempt to create it')
     parser.add_argument('--updates', default=None, type=str, help='Full path to file containing snps and/or metadata to update')
+    parser.add_argument('--sampleSheetUpdates', default=None, type=str, help='')
+    parser.add_argument('--fileOutName', default='sampleSheet.csv', type=str, help='')
     parser.add_argument('--modDir', default=os.path.join(os.getcwd(), 'modules'), type=str, help='Full path to module files .py from github; default is current working directory with modules folder appended')
     parser.add_argument('--logName', default='gtcFuncs.log', type=str, help='Name of log file to output')
-    parser.add_argument('--overrides', default=None, type=str, help='a tab-delimited text file, one snp per line, of snp name and allele change.  Ex: rs12248560.1    [T/A], will update allele rs12248560.1 to have alleles T and A instad of what is listed on the bpm')
+    parser.add_argument('--overrides', default=None, type=str, help='a tab-delimited text file, one snp per line, of snp name and allele change.  Ex: rs12248560.1    [T/A], will update allele rs12248560.1 to have alleles T and A instead of what is listed on the bpm')
     args = parser.parse_args()
 
     if os.path.isdir(args.outDir) == False:
@@ -84,7 +98,7 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename=os.path.join(args.outDir, args.logName))
         logger = logging.getLogger('Initialization')
-        if any(files.endswith('.gtc') for files in os.listdir(args.outDir)):
+        if any(files.endswith('.gtc') for files in os.listdir(args.outDir)) and (args.method != 'createSampleSheet'):
             logger.critical('Output directory contains files with extension .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
             print('\nOutput directory contains files with extension .gtc.  Please move these files to a new directory or create a new directory without gtc files.')
             sys.exit()
@@ -100,6 +114,12 @@ if __name__ == '__main__':
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
         analysisObj.manipulateUpdate(args.updates, args.overrides)
     
+    elif args.method == 'createSampleSheet':
+        logger.info('method createSampleSheet selected \n creating new object of class GtcFunctions')
+        analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
+        analysisObj.createSampleSheet(args.sampleSheetUpdates, args.fileOutName)
+
+
     elif args.method == 'getIntensities':
         logger.info('method getIntensities selected \n creating new object of class GtcFunctions')
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
