@@ -27,6 +27,7 @@ class GtcFunctions:
         self.overrides = overrides
         manipulateGTC.manipulate_gtc(self)
 
+   
     def createSampleSheet(self, sampleSheetUpdates, fileOutName):
         import sampleSheet
 
@@ -47,6 +48,7 @@ class GtcFunctions:
         print('Running module: extractSampleInfo')
         getSampleInfo.reportSampleInfo(self)
 
+ 
     def getIntensities(self):
         import getIntensities
 
@@ -73,6 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--outDir', default=os.getcwd(), type=str,help='Full path to directory or folder to output results.  If it path does not exist, program will attempt to create it')
     parser.add_argument('--updates', default=None, type=str, help='Full path to file containing snps and/or metadata to update')
     parser.add_argument('--sampleSheetUpdates', default=None, type=str, help='')
+    parser.add_argument('--config', default=None, type=str, help='')
     parser.add_argument('--fileOutName', default='sampleSheet.csv', type=str, help='')
     parser.add_argument('--modDir', default=os.path.join(os.getcwd(), 'modules'), type=str, help='Full path to module files .py from github; default is current working directory with modules folder appended')
     parser.add_argument('--logName', default='gtcFuncs.log', type=str, help='Name of log file to output')
@@ -116,7 +119,7 @@ if __name__ == '__main__':
     elif args.method == 'createSampleSheet':
         logger.info('method createSampleSheet selected \n creating new object of class GtcFunctions')
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
-        analysisObj.createSampleSheet(args.sampleSheetUpdates, args.fileOutName)
+        analysisObj.createSampleSheet(args.sampleSheetUpdates, args.fileOutName, args.config)
 
 
     elif args.method == 'getIntensities':
