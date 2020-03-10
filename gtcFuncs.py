@@ -33,21 +33,20 @@ class GtcFunctions:
         logger = logging.getLogger('createSampleSheet')
         logger.debug('Running module: createSampleSheet')
         print('Running module: createSampleSheet')
-   
         self.sampleSheetUpdates = sampleSheetUpdates
-        
         sampleSheet.baseData(self)
         sampleSheet.updateHeader(self)
         sampleSheet.generateSampleSheet(outDir = self.outDir, fileName = fileOutName)
 
 
-    def extractSampleInfo(self, sampleUpdates):
+    def extractSampleInfo(self):
         import getSampleInfo
         
         logger = logging.getLogger('extractSampleInfo')
         logger.debug('Running module: extractSampleInfo')
         print('Running module: extractSampleInfo')
-    
+        getSampleInfo.reportSampleInfo(self)
+
     def getIntensities(self):
         import getIntensities
 
