@@ -1,16 +1,22 @@
 from IlluminaBeadArrayFiles import *
 import struct
 from io import BytesIO
-
+import logging
 '''
 function: getGtcInfo(gtc)
 description: extracts all data elements from a gtc file
 input: name of gtc file
 output: data dictionary of all elements of that gtc file
 '''
+
 def getGtcInfo(gtc):
-    data = {}
+    logger = logging.getLogger('getGtcInfo')
+    logger.debug('In method getGtcInfo')
+
+    logger.info('Extracting information from {}'.format(gtc.split('/')[-1]))
+    
     genotype_calls = GenotypeCalls(gtc)
+    data = {}
     
     data[
         GenotypeCalls.
