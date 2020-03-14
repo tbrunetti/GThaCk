@@ -28,13 +28,14 @@ class GtcFunctions:
         manipulateGTC.manipulate_gtc(self)
 
    
-    def createSampleSheet(self, sampleSheetUpdates, fileOutName):
+    def createSampleSheet(self, sampleSheetUpdates, fileOutName, config):
         import sampleSheet
 
         logger = logging.getLogger('createSampleSheet')
         logger.debug('Running module: createSampleSheet')
         print('Running module: createSampleSheet')
         self.sampleSheetUpdates = sampleSheetUpdates
+        self.config = config
         sampleSheet.baseData(self)
         sampleSheet.updateHeader(self)
         sampleSheet.generateSampleSheet(outDir = self.outDir, fileName = fileOutName)
