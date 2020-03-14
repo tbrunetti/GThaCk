@@ -8,9 +8,9 @@ import pandas
 
 '''
 function: baseData(self)
-description:
+description: extracts information from each gtc file in the directory to get all base metadata information formated into csv for sample sheet
 input: gtcFunction object
-output:
+output: does not return anything, however, a temporary file [data] csv is generated on the local system
 '''
 def baseData(self):
 	import extractInformation
@@ -18,54 +18,146 @@ def baseData(self):
 	bpm=self.bpm
 	gtcDir=self.gtcDir
 	outDir=self.outDir
-	sampleSheetUpdates = self.sampleSheetUpdates
+	sampleSheetUpdatesInput = self.sampleSheetUpdates
+	config = self.config
 
 	logger = logging.getLogger('generateSampleSheet')
 	logger.debug('In method generateSampleSheet')
 
-	manifest = BeadPoolManifest(bpm)
+	def checkConfig(config):
+		logger = logging.getLogger('checkConfig')
+		logger.debug('In module sampleSheet.py in baseData() in submodule checkConfig')
 
-	smplSheetcols = ['Sample_ID','SentrixBarcode_A','SentrixPosition_A','Sample_Plate','Sample_Well','Gender','Sample_Name','Instrument_ID','Race','MRN','Name','DOB','exclude','Notes']
-	#dataManifest = pandas.DataFrame(columns = smplSheetcols)
-	outputInfo = []
+		totalGtcs = sum([1 for gtcFile in os.listdir(gtcDir) if gtcFile.endswith('.gtc')])
 	
+		configParams = {}
+		with open(config, 'r') as baseParameters:
+			for line in baseParameters:
+				configParams[line.split(':')[0]] = [line.split(':')[1]]
+
+		try:
+			assert ((totalGtcs - len(configParams['control_wells']) <= totalGtcs) and (totalGtcs - len(configParams['control_wells']) >= 0))
+			return configParams
+		
+		except AssertionError:
+			print('There are not enough .gtc files to assign new values that are not controls')
+			logger.critical('There are not enough .gtc files to assign new values that are not controls')
+			sys.exit()
+	
+	
+	def updateData(gtcFile, data, sampleSheetUpdates, exclude, gtcMatchFile):
+		logger = logging.getLogger('updateData')
+		logger.debug('In module sampleSheet.py in baseData() in submodule updateData')
+		if sampleSheetUpdates == None:
+			manifestGender = 'Unknown'
+			if data[1007].decode() == 'F':
+				manifestSex = 'Female'
+			elif data[1007].decode() == 'M':
+				manifestSex = 'Male'
+			colValues = [
+				data[10].decode(),
+				data[1016].decode(),
+				gtcFile.split('_')[1][:-4],
+				data[11].decode(),
+				data[12].decode(),
+				manifestSex,
+				data[10].decode(),
+				'0000000000',
+				'NA',
+				'000',
+				'UNKNOWN, UNKNOWN',
+				'00-00-0000',
+				exclude,
+				'validationPlate'
+				]
+			gtcMatchFile.write('\t'.join([gtcFile, data[10].decode(), data[12].decode(), manifestSex,
+				'0000000000', '000', 'UNKNOWN, UNKNOWN', '00-00-0000']) + '\n')
+
+		else:
+			logger.debug('Updating {} in manifest sample sheet'.format(sampleSheetUpdates['patientName']))
+			colValues = [
+				data[10].decode(),
+				data[1016].decode(),
+				gtcFile.split('_')[1][:-4],
+				data[11].decode(),
+				data[12].decode(),
+				sampleSheetUpdates['sex'],
+				data[10].decode(),
+				sampleSheetUpdates['instrumentID'],
+				'NA',
+				sampleSheetUpdates['mrn'],
+				sampleSheetUpdates['patientName'],
+				sampleSheetUpdates['DOB'],
+				exclude,
+				'validationPlate'
+				]
+
+			gtcMatchFile.write('\t'.join([gtcFile, data[10].decode(), data[12].decode(), sampleSheetUpdates['sex'],
+				sampleSheetUpdates['instrumentID'], sampleSheetUpdates['mrn'], sampleSheetUpdates['patientName'],
+				sampleSheetUpdates['DOB']]) + '\n')
+
+		
+		return colValues
+
+
+	'''
+	TODO:
+	# add config of wells of control positions -- are always included in the exclude column (set to 1)
+	# first x positions not controls update MRN, instrument ID
+	# exclude = 1 except for controls and any updated IDs
+	# exclude keyword and include keyword -- based on gtcID
+	# print out a file with which gtc file is paired with
+	# tab-delimited columns: patientName, DOB, sex, mrn, instrumentID as case-insensitive
+	# sex needs to be coded as Male and Female not M and F
+	# make sample sheet columns and order mutable based on config file
+	'''
+	manifest = BeadPoolManifest(bpm)
+	gtcMatchData = open(os.path.join(outDir, 'gtcFiles_paired_sampleSheet.txt'), 'w')
+	configParams = checkConfig(config = config)
+	if sampleSheetUpdatesInput != None:
+		sampleSheetUpdates = pandas.read_table(sampleSheetUpdatesInput, dtype=str)
+	else:
+		sampleSheetUpdates = pandas.DataFrame()
+	smplSheetcols = ['Sample_ID','SentrixBarcode_A','SentrixPosition_A','Sample_Plate','Sample_Well','Gender','Sample_Name','Instrument_ID','Race','MRN','Name','DOB','exclude','Notes']
+	outputInfo = []
+
 	for gtcFile in os.listdir(gtcDir):
 		if gtcFile.endswith('.gtc'):
+			colValues = []
 			data = extractInformation.getGtcInfo(os.path.join(gtcDir, gtcFile))
-			colValues = [data[10].decode(),
-						data[1016].decode(),
-						gtcFile.split('_')[1][:-4],
-						data[11].decode(),
-						data[12].decode(),
-						data[1007].decode(),
-						data[10].decode(),
-						'0000000000',
-						'NA',
-						'000',
-						'UNKNOWN, UNKNOWN',
-						'00-00-0000',
-						'0',
-						'validationPlate'
-			 			]
-			print(colValues)
+			if data[12].decode() in configParams['control_wells']:
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=0, gtcMatchFile=gtcMatchData)
+			elif gtcFile in configParams['exclude_gtcs']:
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=1, gtcMatchFile=gtcMatchData)
+			elif len(sampleSheetUpdates.index) > 0:
+				print(sampleSheetUpdates)
+				print(sampleSheetUpdates.iloc[0])
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=sampleSheetUpdates.iloc[0].to_dict(), exclude=0, gtcMatchFile=gtcMatchData)
+				sampleSheetUpdates.drop(0, inplace=True)
+				sampleSheetUpdates.reset_index(drop=True, inplace=True)
+			else:
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=0, gtcMatchFile=gtcMatchData)
+
+			#print(colValues)
 			paired = zip(smplSheetcols, colValues)
 			singleSample = dict(paired)
 			outputInfo.append(singleSample)
-			
-	dataManifest= pandas.DataFrame(outputInfo)
-	print(dataManifest)
-	#dataManifest = pandas.concat([dataManifest, outputInfo], axis=0).reset_index()
-	dataManifest.to_csv(os.path.join(outDir, '_tmp_data.csv'), index=False)
 
-	def updateData(sampleSheetUpdates):
-		pass
-
+	try:
+		assert len(sampleSheetUpdates.index) == 0
+		dataManifest= pandas.DataFrame(outputInfo)
+		dataManifest.to_csv(os.path.join(outDir, '_tmp_data.csv'), index=False)
+		gtcMatchData.flush()
+		gtcMatchData.close()
+	except AssertionError:
+		print('Not all samples in sample update list were used in gtc file')
+		logger.error('Not all samples in sample update list were used in gtc file')
 
 '''
 function: updateHeader(self)
-description:
+description: generates the header portion of the sample sheet
 input: gtcFunction object
-output:
+output: nothing is returned, however, a temporary file [header] csv is generated on the local system
 '''
 def updateHeader(self):
 	from datetime import datetime
@@ -106,7 +198,7 @@ def updateHeader(self):
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder[0] = 'A'
-	placeHolder[1] = bpm[:-4]
+	placeHolder[1] = bpm.split('/')[-1][:-4]
 	placeHolder[2] = 'CCPM-MEGA-Ex_validation_07-21-17-1.egt'
 	headerFile.write(','.join(placeHolder) + '\n')
 
@@ -122,9 +214,9 @@ def updateHeader(self):
 
 '''
 function: generateSampleSheet(outDir, fileName)
-description:
-input:
-output:
+description: combines the temorary [header] and [data] csv files to generate final manifest
+input: path to output directory and the name of the final sample sheet
+output: does not return anything, however, a final csv sample sheet is generated on the local system
 '''
 def generateSampleSheet(outDir, fileName):
 	import subprocess
