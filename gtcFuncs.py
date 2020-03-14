@@ -118,6 +118,8 @@ if __name__ == '__main__':
         analysisObj.manipulateUpdate(args.updates, args.overrides)
     
     elif args.method == 'createSampleSheet':
+        if args.config == None:
+            parser.error('method createSampleSheet requires argument --config')
         logger.info('method createSampleSheet selected \n creating new object of class GtcFunctions')
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
         analysisObj.createSampleSheet(args.sampleSheetUpdates, args.fileOutName, args.config)
