@@ -7,11 +7,11 @@ Code to hack through, manipulate, and extract information from GTC files
 1.  [Introduction and Overview](#introduction-and-overview)
 2.  [Software Requirements and Dependencies](#software-requirements-and-dependencies)
 3.  [Installation](#installation)
-4.  [Usage](#usage)
+4.  [General Usage](#general-usage)
 	* method: [manipulateGTCs](#method-manipulateGTCs)
-	* method: createSampleSheet
-	* method: getIntensities
-	* method: sampleInformation
+	* method: [createSampleSheet](#method-createSampleSheet)
+	* method: [getIntensities](#method-getIntensities)
+	* method: [sampleInformation](#method-sampleInformation)
 
 ### Introduction and Overview
 -----------------------------
@@ -41,11 +41,13 @@ tar -zxvf IlluminaBeadArrayFiles
 ```
 
 
-### Usage
-----------
-Every function has the same 2 requirements: the bpm file and the directory of the location of the gtcs
-
-For help on all the options available and what they do, please run the following or see the table at the bottom of the page:
+### General Usage
+-----------------
+Every function has the same 2 requirements: the bpm file specified using `--bpm`  and the directory of the location of the gtcs specified using `--gtcDir` in addition to specific argument required or optionally specified for that particular method.  For more information please visit the table of options for each method listed in the [wiki here](https://github.com/tbrunetti/GThaCk/wiki)
+```
+python3 gtcFuncs.py {method} --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/
+```
+For help on all the options available and what they do, please run the following or see the full table of options located on the [wiki](https://github.com/tbrunetti/GThaCk/wiki):
 ```
 python3 gtcFuncs.py -h
 ```
