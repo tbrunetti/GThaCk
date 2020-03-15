@@ -8,7 +8,8 @@ Code to hack through, manipulate, and extract information from GTC files
 2.  [Software Requirements and Dependencies](#software-requirements-and-dependencies)
 3.  [Installation](#installation)
 4.  [Usage](#usage)
-	* method: manipulateGTCs
+	* method: [manipulateGTCs](#method-manipulateGTCs)
+	* method: createSampleSheet
 	* method: getIntensities
 	* method: sampleInformation
 
@@ -50,7 +51,7 @@ python3 gtcFuncs.py -h
 ```
 
 
-**method: manipulateGTCs**  
+#### **method: manipulateGTCs**  
 The minimum command required to manipulate gtc files is the following:
 ```
 python3 gtcFuncs.py manipulateGTCs --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --updates myUpdates.txt
@@ -68,7 +69,7 @@ _For snp updates_
 *  second column = the alleles to change it to.  Must always be an allele pair.  
 *  The snps are update for the sample until the next sample is reached as determined by the next ">" character of metadata
 	
-Another option that is available exclusively to the method manipulateGTCs is the `--override` argument.  If a snp call needs to be updated in the bpm it can be made using this argument using an overrides file.  This **does not** create an updated bpm file, it is merely used so that a gtc can pass validation due to misrepresentation of a wrong allele(s).  The bpm file is updated within the scope of the running program, however, it will not write out a new bpm, only the original bpm will persist.  An example of an override file can be seen [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt) in [examples/override.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt).  
+Another option that is available exclusively to the method manipulateGTCs is the `--overrides` argument.  If a snp call needs to be updated in the bpm it can be made using this argument using an overrides file.  This **does not** create an updated bpm file, it is merely used so that a gtc can pass validation due to misrepresentation of a wrong allele(s).  The bpm file is updated within the scope of the running program, however, it will not write out a new bpm, only the original bpm will persist.  An example of an override file can be seen [here](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt) in [examples/override.txt](https://github.com/tbrunetti/GThaCk/blob/develop/examples/override.txt).  
 
 Here is an example of how that would look like on the command line:
 ```
@@ -76,11 +77,20 @@ python3 gtcFuncs.py manipulateGTCs --bpm /path/to/manifest.bpm --gtcDir /path/to
 ```
 
 
-**method: createSampleSheet**  
+#### **method: createSampleSheet**
+The minimum command required to manipulate gtc files is the following:
+```
+python3 gtcFuncs.py createSampleSheet --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --config examples/sampleSheet.cfg
+```
 
-**method: getIntensities**  
+Here is an example of how that would look like on the command line:
+```
+python3 gtcFuncs.py createSampleSheet --bpm /path/to/manifest.bpm --gtcDir /path/to/gtcLocations/ --outDir /path/to/gtcLocations/ --config examples/sampleSheet.cfg --sampleSheetUpdates updateSampleSheet.txt
+```
 
-**method: sampleInformation**  
+#### **method: getIntensities**  
+
+#### **method: sampleInformation**  
 
 
 
