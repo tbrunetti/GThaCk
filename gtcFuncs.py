@@ -28,7 +28,7 @@ class GtcFunctions:
         manipulateGTC.manipulate_gtc(self)
 
    
-    def createSampleSheet(self, sampleSheetUpdates, fileOutName, config):
+    def createSampleSheet(self, sampleSheetUpdates, pseudoInstID, pseudoMrn, fileOutName, config):
         import sampleSheet
 
         logger = logging.getLogger('createSampleSheet')
@@ -36,6 +36,8 @@ class GtcFunctions:
         print('Running module: createSampleSheet')
         self.sampleSheetUpdates = sampleSheetUpdates
         self.config = config
+        self.pseudoInstID = pseudoInstID
+        self.pseudoMrn = pseudoMrn
         sampleSheet.baseData(self)
         sampleSheet.updateHeader(self)
         sampleSheet.generateSampleSheet(outDir = self.outDir, fileName = fileOutName)
@@ -77,10 +79,13 @@ if __name__ == '__main__':
     parser.add_argument('--updates', default=None, type=str, help='Full path to file containing snps and/or metadata to update')
     parser.add_argument('--sampleSheetUpdates', default=None, type=str, help='Path and name of samplesheet updates.  Tab-delimited with following headers required: patientName, DOB, sex, mrn, instrumentID -- GThaCk wiki for help')
     parser.add_argument('--config', default=None, type=str, help='Path and name to configuration file -- see GThaCk wiki for help')
-    parser.add_argument('--fileOutName', default='sampleSheet.csv', type=str, help='Name of log file to output, will be created in directory --outDir')
+    parser.add_argument('--fileOutName', default='sampleSheet.csv', type=str, help='Name of final samplesheet file to output, will be created in directory --outDir')
     parser.add_argument('--modDir', default=os.path.join(os.getcwd(), 'modules'), type=str, help='Full path to module files .py from github; default is current working directory with modules folder appended')
     parser.add_argument('--logName', default='gtcFuncs.log', type=str, help='Name of log file to output, will be created in directory --outDir')
     parser.add_argument('--overrides', default=None, type=str, help='a tab-delimited text file to temporary update the snp listed in the bpm file (not GTC!), one snp per line, of snp name and allele change.  Ex: rs12248560.1    [T/A], will update allele rs12248560.1 to have alleles T and A instead of what is listed on the bpm')
+    parser.add_argument('--pseudoInstID', default='7000000000,9999999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select instrument ID.  Both integers must be 10 digits.')
+    parser.add_argument('--pseudoMrn', default='2000000,7999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select MRN.  Both integers must be 7 digits.')
+
     args = parser.parse_args()
 
     if os.path.isdir(args.outDir) == False:
@@ -120,9 +125,14 @@ if __name__ == '__main__':
     elif args.method == 'createSampleSheet':
         if args.config == None:
             parser.error('method createSampleSheet requires argument --config')
+        if str(args.pseudoInstID.split(',')[0])[0] == '0' or str(args.pseudoInstID.split(',')[1])[0] == '0' or len(str(args.pseudoInstID.split(',')[0])) != 10 or len(str(args.pseudoInstID.split(',')[1])) != 10:
+            parser.error('Please make sure pseudoInstID does not have ints beginning with 0 or are not integers of length 10')
+        if str(args.pseudoMrn.split(',')[0])[0] == '0' or str(args.pseudoMrn.split(',')[1])[0] == '0' or len(str(args.pseudoMrn.split(',')[0])) != 7 or len(str(args.pseudoMrn.split(',')[1])) != 7:
+            parser.error('Please make sure pseudoMrn does not have ints beginning with 0 or are not integers of length 7')
+
         logger.info('method createSampleSheet selected \n creating new object of class GtcFunctions')
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
-        analysisObj.createSampleSheet(args.sampleSheetUpdates, args.fileOutName, args.config)
+        analysisObj.createSampleSheet(args.sampleSheetUpdates, args.pseudoInstID, args.pseudoMrn, args.fileOutName, args.config)
 
 
     elif args.method == 'getIntensities':
