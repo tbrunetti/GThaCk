@@ -6,6 +6,33 @@ import sys
 import logging
 import pandas
 
+
+'''
+function: baseData(self)
+description: extracts information from each gtc file in the directory to get all base metadata information formated into csv for sample sheet
+input: gtcFunction object
+output: does not return anything, however, a temporary file [data] csv is generated on the local system
+'''
+def checkConfig(config, gtcDir):
+	logger = logging.getLogger('checkConfig')
+	logger.debug('In module sampleSheet.py in baseData() in submodule checkConfig')
+
+	totalGtcs = sum([1 for gtcFile in os.listdir(gtcDir) if gtcFile.endswith('.gtc')])
+	
+	configParams = {}
+	with open(config, 'r') as baseParameters:
+		for line in baseParameters:
+			configParams[line.split(':')[0]] = [line.split(':')[1].rstrip()]
+
+	try:
+		assert ((totalGtcs - len(configParams['control_wells']) <= totalGtcs) and (totalGtcs - len(configParams['control_wells']) >= 0))
+		return configParams, totalGtcs
+		
+	except AssertionError:
+		print('There are not enough .gtc files to assign new values that are not controls')
+		logger.critical('There are not enough .gtc files to assign new values that are not controls')
+		sys.exit()
+
 '''
 function: baseData(self)
 description: extracts information from each gtc file in the directory to get all base metadata information formated into csv for sample sheet
@@ -27,26 +54,6 @@ def baseData(self):
 	logger = logging.getLogger('generateSampleSheet')
 	logger.debug('In method generateSampleSheet')
 
-	def checkConfig(config):
-		logger = logging.getLogger('checkConfig')
-		logger.debug('In module sampleSheet.py in baseData() in submodule checkConfig')
-
-		totalGtcs = sum([1 for gtcFile in os.listdir(gtcDir) if gtcFile.endswith('.gtc')])
-	
-		configParams = {}
-		with open(config, 'r') as baseParameters:
-			for line in baseParameters:
-				configParams[line.split(':')[0]] = [line.split(':')[1]]
-
-		try:
-			assert ((totalGtcs - len(configParams['control_wells']) <= totalGtcs) and (totalGtcs - len(configParams['control_wells']) >= 0))
-			return configParams, totalGtcs
-		
-		except AssertionError:
-			print('There are not enough .gtc files to assign new values that are not controls')
-			logger.critical('There are not enough .gtc files to assign new values that are not controls')
-			sys.exit()
-	
 	
 	def updateData(gtcFile, data, sampleSheetUpdates, default, exclude, gtcMatchFile):
 		logger = logging.getLogger('updateData')
@@ -116,7 +123,7 @@ def baseData(self):
 	'''
 	manifest = BeadPoolManifest(bpm)
 	gtcMatchData = open(os.path.join(outDir, 'gtcFiles_paired_sampleSheet.txt'), 'w')
-	configParams, totalGtcs = checkConfig(config = config)
+	configParams, totalGtcs = checkConfig(config = config, gtcDir = gtcDir)
 	if sampleSheetUpdatesInput != None:
 		sampleSheetUpdates = pandas.read_table(sampleSheetUpdatesInput, dtype=str)
 	else:
@@ -174,9 +181,13 @@ def updateHeader(self):
 
 	outDir = self.outDir
 	bpm = self.bpm
+	config = self.config
+	gtcDir = self.gtcDir
 
 	logger = logging.getLogger('updateHeader')
 	logger.debug('In method updateHeader')
+
+	configParams, totalGtcs = checkConfig(config=config, gtcDir=gtcDir)
 
 	smplSheetcols = ['Sample_ID','SentrixBarcode_A','SentrixPosition_A','Sample_Plate','Sample_Well','Gender','Sample_Name','Instrument_ID','Race','MRN','Name','DOB','exclude','Notes']
 
@@ -186,15 +197,15 @@ def updateHeader(self):
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder[0] = 'Institute Name'
-	placeHolder[1] = 'CCPM Biobank'
+	placeHolder[1] = configParams['institute_name'][0]
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder[0] = 'Investigator Name'
-	placeHolder[1] = 'Kathleen Barnes'
+	placeHolder[1] = configParams['investigator_name'][0]
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder[0] = 'Project Name'
-	placeHolder[1] = 'CCPM-MEGAv1_validation_manifest1-8_PGX'
+	placeHolder[1] = configParams['project_name'][0]
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder[0] = 'Date'
@@ -209,7 +220,7 @@ def updateHeader(self):
 
 	placeHolder[0] = 'A'
 	placeHolder[1] = bpm.split('/')[-1][:-4]
-	placeHolder[2] = 'CCPM-MEGA-Ex_validation_07-21-17-1.egt'
+	placeHolder[2] = configParams['egt_cluster_file'][0]
 	headerFile.write(','.join(placeHolder) + '\n')
 
 	placeHolder = ['' for i in range(0, len(smplSheetcols))]
@@ -243,7 +254,6 @@ def generateSampleSheet(outDir, fileName):
 		finalFile.close()
 	except subprocess.CalledProcessError:
 		pass
-
 
 	subprocess.run(['rm', os.path.join(outDir, '_tmp_headerFile.csv')])
 	subprocess.run(['rm', os.path.join(outDir, '_tmp_data.csv')])
