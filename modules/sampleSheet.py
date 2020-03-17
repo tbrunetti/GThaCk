@@ -14,12 +14,15 @@ output: does not return anything, however, a temporary file [data] csv is genera
 '''
 def baseData(self):
 	import extractInformation
+	import random
 
 	bpm=self.bpm
 	gtcDir=self.gtcDir
 	outDir=self.outDir
 	sampleSheetUpdatesInput = self.sampleSheetUpdates
 	config = self.config
+	pseudoInstID = self.pseudoInstID
+	pseudoMrn = self.pseudoMrn
 
 	logger = logging.getLogger('generateSampleSheet')
 	logger.debug('In method generateSampleSheet')
@@ -37,7 +40,7 @@ def baseData(self):
 
 		try:
 			assert ((totalGtcs - len(configParams['control_wells']) <= totalGtcs) and (totalGtcs - len(configParams['control_wells']) >= 0))
-			return configParams
+			return configParams, totalGtcs
 		
 		except AssertionError:
 			print('There are not enough .gtc files to assign new values that are not controls')
@@ -45,7 +48,7 @@ def baseData(self):
 			sys.exit()
 	
 	
-	def updateData(gtcFile, data, sampleSheetUpdates, exclude, gtcMatchFile):
+	def updateData(gtcFile, data, sampleSheetUpdates, default, exclude, gtcMatchFile):
 		logger = logging.getLogger('updateData')
 		logger.debug('In module sampleSheet.py in baseData() in submodule updateData')
 		if sampleSheetUpdates == None:
@@ -62,16 +65,16 @@ def baseData(self):
 				data[12].decode(),
 				manifestSex,
 				data[10].decode(),
-				'0000000000',
-				'NA',
-				'000',
+				str(default['instID']),
+				'',
+				str(default['mrn']),
 				'UNKNOWN, UNKNOWN',
 				'00-00-0000',
 				exclude,
 				'validationPlate'
 				]
 			gtcMatchFile.write('\t'.join([gtcFile, data[10].decode(), data[12].decode(), manifestSex,
-				'0000000000', '000', 'UNKNOWN, UNKNOWN', '00-00-0000']) + '\n')
+				str(default['instID']), str(default['mrn']), 'UNKNOWN, UNKNOWN', '00-00-0000']) + '\n')
 
 		else:
 			logger.debug('Updating {} in manifest sample sheet'.format(sampleSheetUpdates['patientName']))
@@ -84,7 +87,7 @@ def baseData(self):
 				sampleSheetUpdates['sex'],
 				data[10].decode(),
 				sampleSheetUpdates['instrumentID'],
-				'NA',
+				'',
 				sampleSheetUpdates['mrn'],
 				sampleSheetUpdates['patientName'],
 				sampleSheetUpdates['DOB'],
@@ -113,7 +116,7 @@ def baseData(self):
 	'''
 	manifest = BeadPoolManifest(bpm)
 	gtcMatchData = open(os.path.join(outDir, 'gtcFiles_paired_sampleSheet.txt'), 'w')
-	configParams = checkConfig(config = config)
+	configParams, totalGtcs = checkConfig(config = config)
 	if sampleSheetUpdatesInput != None:
 		sampleSheetUpdates = pandas.read_table(sampleSheetUpdatesInput, dtype=str)
 	else:
@@ -121,24 +124,30 @@ def baseData(self):
 	smplSheetcols = ['Sample_ID','SentrixBarcode_A','SentrixPosition_A','Sample_Plate','Sample_Well','Gender','Sample_Name','Instrument_ID','Race','MRN','Name','DOB','exclude','Notes']
 	outputInfo = []
 
+	randomInstIDs = random.sample(range(int(pseudoInstID.split(',')[0]), int(pseudoInstID.split(',')[1])), totalGtcs)
+	randomMrns = random.sample(range(int(pseudoMrn.split(',')[0]), int(pseudoMrn.split(',')[1])), totalGtcs)
+
 	for gtcFile in os.listdir(gtcDir):
 		if gtcFile.endswith('.gtc'):
 			colValues = []
 			data = extractInformation.getGtcInfo(os.path.join(gtcDir, gtcFile))
 			if data[12].decode() in configParams['control_wells']:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=0, gtcMatchFile=gtcMatchData)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=0, gtcMatchFile=gtcMatchData)
+				randomInstIDs.pop(0)
+				randomMrns.pop(0)
 			elif gtcFile in configParams['exclude_gtcs']:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=1, gtcMatchFile=gtcMatchData)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=1, gtcMatchFile=gtcMatchData)
+				randomInstIDs.pop(0)
+				randomMrns.pop(0)			
 			elif len(sampleSheetUpdates.index) > 0:
-				print(sampleSheetUpdates)
-				print(sampleSheetUpdates.iloc[0])
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=sampleSheetUpdates.iloc[0].to_dict(), exclude=0, gtcMatchFile=gtcMatchData)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=sampleSheetUpdates.iloc[0].to_dict(), default=None, exclude=0, gtcMatchFile=gtcMatchData)
 				sampleSheetUpdates.drop(0, inplace=True)
-				sampleSheetUpdates.reset_index(drop=True, inplace=True)
+				sampleSheetUpdates.reset_index(drop=True, inplace=True)	
 			else:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, exclude=0, gtcMatchFile=gtcMatchData)
-
-			#print(colValues)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=0, gtcMatchFile=gtcMatchData)
+				randomInstIDs.pop(0)
+				randomMrns.pop(0)
+			
 			paired = zip(smplSheetcols, colValues)
 			singleSample = dict(paired)
 			outputInfo.append(singleSample)
@@ -146,6 +155,7 @@ def baseData(self):
 	try:
 		assert len(sampleSheetUpdates.index) == 0
 		dataManifest= pandas.DataFrame(outputInfo)
+		dataManifest.sort_values(by=['Sample_Well'], inplace=True)
 		dataManifest.to_csv(os.path.join(outDir, '_tmp_data.csv'), index=False)
 		gtcMatchData.flush()
 		gtcMatchData.close()
