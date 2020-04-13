@@ -23,7 +23,7 @@ def reportSampleInfo(self):
     
     for sampleGtc in input_gtc_list:
         try:
-            names = getGTCinfo(gtc=os.path.join(gtcDir, sampleGtc))
+            names = extractInformation.getGtcInfo(gtc=os.path.join(gtcDir, sampleGtc))
             assert manifest.manifest_name == names[101]
             nameMatch.write(names[10] + '\t' + 
                 names[11] + '\t' + names[12] + '\t' + 
