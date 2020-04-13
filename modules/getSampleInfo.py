@@ -25,12 +25,12 @@ def reportSampleInfo(self):
         try:
             names = extractInformation.getGtcInfo(gtc=os.path.join(gtcDir, sampleGtc))
             assert manifest.manifest_name == names[101]
-            nameMatch.write(names[10] + '\t' + 
-                names[11] + '\t' + names[12] + '\t' + 
+            nameMatch.write(names[10].decode() + '\t' + 
+                names[11].decode() + '\t' + names[12].decode() + '\t' + 
                 sampleGtc + '\t' +
-                '{}-{}-{}'.format(names[11], names[12], names[10]) + 
+                '{}-{}-{}'.format(names[11].decode(), names[12].decode(), names[10].decode()) + 
                 '\t' + str(names[1006]) + '\t' + str(names[1009]) + '\t' +
-                str(names[1007]) + '\t' + str(names[1008]) + '\n')
+                str(names[1007].decode()) + '\t' + str(names[1008]) + '\n')
 
         except AssertionError:
             print("Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.".format(
