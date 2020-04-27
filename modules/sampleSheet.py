@@ -8,7 +8,8 @@ import pandas
 import pympler
 from pympler import muppy
 from pympler import summary
-
+#from multiprocessing import Process
+import multiprocessing
 
 '''
 function: baseData(self)
@@ -67,6 +68,8 @@ def baseData(self):
 				manifestSex = 'Female'
 			elif data[1007].decode() == 'M':
 				manifestSex = 'Male'
+			elif data[1007].decode() == 'U':
+				manifestSex = "Unknown"
 			colValues = [
 				data[10].decode(),
 				data[1016].decode(),
@@ -137,10 +140,13 @@ def baseData(self):
 	randomInstIDs = random.sample(range(int(pseudoInstID.split(',')[0]), int(pseudoInstID.split(',')[1])), totalGtcs)
 	randomMrns = random.sample(range(int(pseudoMrn.split(',')[0]), int(pseudoMrn.split(',')[1])), totalGtcs)
 
-	for gtcFile in os.listdir(gtcDir):
+	
+
+	def gtcProcessing(gtcFile, finalList):
+
 		print('Pre-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
-		all_objects_in_gtc = muppy.get_objects()
-		minMem = summary.summarize(all_objects_in_gtc)
+		#all_objects_in_gtc = muppy.get_objects()
+		#print(summary.summarize(all_objects_in_gtc))
 		if gtcFile.endswith('.gtc'):
 			colValues = []
 			data = extractInformation.getGtcInfo(os.path.join(gtcDir, gtcFile))
@@ -160,18 +166,28 @@ def baseData(self):
 				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=0, gtcMatchFile=gtcMatchData)
 				randomInstIDs.pop(0)
 				randomMrns.pop(0)
-			
+				
 			singleSample = dict(zip(smplSheetcols, colValues))
-			outputInfo.append(singleSample)
 			print('Post-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
-			all_objects_in_gtc = pympler.muppy.get_objects()
-			maxMem = pympler.summary.summarize(all_objects_in_gtc)
-			del singleSample
+			finalList.append(singleSample)
+
+	dataManager = multiprocessing.Manager()
+	finalList = dataManager.list()
+	listOfJobs = []
+	for gtcFile in os.listdir(gtcDir):
+		processes = multiprocessing.Process(target =gtcProcessing, args=(gtcFile, finalList))
+		listOfJobs.append(processes)
+		processes.start()
+
+	for eachJob in listOfJobs:
+		eachJob.join()
+
+	# convert a proxy list to normal list object for use in downstream code
+	convertedList = [i for i in finalList]
 
 	try:
 		assert len(sampleSheetUpdates.index) == 0
-		dataManifest= pandas.DataFrame(outputInfo)
-
+		dataManifest= pandas.DataFrame(convertedList)
 		dataManifest.sort_values(by=['Sample_Well'], inplace=True)
 		dataManifest.to_csv(os.path.join(outDir, '_tmp_data.csv'), index=False)
 		gtcMatchData.flush()
@@ -242,6 +258,8 @@ def updateHeader(self):
 
 	headerFile.flush()
 	headerFile.close()
+
+	del placeHolder
 
 
 '''
