@@ -5,6 +5,9 @@ import os
 import sys
 import logging
 import pandas
+import pympler
+from pympler import muppy
+from pympler import summary
 
 
 '''
@@ -135,6 +138,9 @@ def baseData(self):
 	randomMrns = random.sample(range(int(pseudoMrn.split(',')[0]), int(pseudoMrn.split(',')[1])), totalGtcs)
 
 	for gtcFile in os.listdir(gtcDir):
+		print('Pre-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
+		all_objects_in_gtc = muppy.get_objects()
+		minMem = summary.summarize(all_objects_in_gtc)
 		if gtcFile.endswith('.gtc'):
 			colValues = []
 			data = extractInformation.getGtcInfo(os.path.join(gtcDir, gtcFile))
@@ -155,17 +161,22 @@ def baseData(self):
 				randomInstIDs.pop(0)
 				randomMrns.pop(0)
 			
-			paired = zip(smplSheetcols, colValues)
-			singleSample = dict(paired)
+			singleSample = dict(zip(smplSheetcols, colValues))
 			outputInfo.append(singleSample)
+			print('Post-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
+			all_objects_in_gtc = pympler.muppy.get_objects()
+			maxMem = pympler.summary.summarize(all_objects_in_gtc)
+			del singleSample
 
 	try:
 		assert len(sampleSheetUpdates.index) == 0
 		dataManifest= pandas.DataFrame(outputInfo)
+
 		dataManifest.sort_values(by=['Sample_Well'], inplace=True)
 		dataManifest.to_csv(os.path.join(outDir, '_tmp_data.csv'), index=False)
 		gtcMatchData.flush()
 		gtcMatchData.close()
+		del dataManifest
 	except AssertionError:
 		print('Not all samples in sample update list were used in gtc file')
 		logger.error('Not all samples in sample update list were used in gtc file')
