@@ -126,7 +126,7 @@ def manipulate_gtc(self):
             assert (gtc_copy.get_control_x_intensities() ==original_genotype.get_control_x_intensities()).all()
             assert (gtc_copy.get_control_y_intensities() ==original_genotype.get_control_y_intensities()).all()
             assert gtc_copy.get_num_no_calls() == original_genotype.get_num_no_calls()
-            assert gtc_copy.get_gender() == original_genotype.get_gender()
+            #assert gtc_copy.get_gender() == original_genotype.get_gender()
             assert (gtc_copy.get_genotype_scores() ==original_genotype.get_genotype_scores()).all()
             #assert gtc_copy.get_genotypes() == genotype_calls.get_genotypes()  -- do not activate, will def fail if snps are changed
             assert gtc_copy.get_percentiles_x() == original_genotype.get_percentiles_x()
