@@ -176,7 +176,7 @@ def baseData(self):
 	finalList = dataManager.list()
 	listOfJobs = []
 	for gtcFile in enumerate(glob.glob(os.path.join(gtcDir, "*.gtc"))):
-		print(gtcFile)
+		print(gtcFile[1].split('/')[-1])
 		#processes = multiprocessing.Process(target =gtcProcessing, args=(gtcFile, finalList))
 		#listOfJobs.append(processes)
 		#processes.start()
