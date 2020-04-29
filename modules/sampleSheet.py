@@ -10,6 +10,7 @@ from pympler import muppy
 from pympler import summary
 #from multiprocessing import Process
 import multiprocessing
+import glob
 
 '''
 function: baseData(self)
@@ -174,16 +175,17 @@ def baseData(self):
 	dataManager = multiprocessing.Manager()
 	finalList = dataManager.list()
 	listOfJobs = []
-	for gtcFile in os.listdir(gtcDir):
-		processes = multiprocessing.Process(target =gtcProcessing, args=(gtcFile, finalList))
-		listOfJobs.append(processes)
-		processes.start()
+	for gtcFile in enumerate(glob.glob(os.path.join(gtcDir, "*.gtc"))):
+		print(gtcFile)
+		#processes = multiprocessing.Process(target =gtcProcessing, args=(gtcFile, finalList))
+		#listOfJobs.append(processes)
+		#processes.start()
 
-	for eachJob in listOfJobs:
-		eachJob.join()
+	#for eachJob in listOfJobs:
+	#	eachJob.join()
 
 	# convert a proxy list to normal list object for use in downstream code
-	convertedList = [i for i in finalList]
+	#convertedList = [i for i in finalList]
 
 	try:
 		assert len(sampleSheetUpdates.index) == 0
