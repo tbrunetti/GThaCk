@@ -24,7 +24,7 @@ def reportSampleInfo(self):
     for sampleGtc in input_gtc_list:
         try:
             names = extractInformation.getGtcInfo(gtc=os.path.join(gtcDir, sampleGtc))
-            assert manifest.manifest_name == names[101]
+            assert manifest.manifest_name.decode() == names[101].decode()
             nameMatch.write(names[10].decode() + '\t' + 
                 names[11].decode() + '\t' + names[12].decode() + '\t' + 
                 sampleGtc + '\t' +
