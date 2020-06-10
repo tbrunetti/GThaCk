@@ -13,8 +13,9 @@ def reportSampleInfo(self):
     bpm = self.bpm
     gtcDir = self.gtcDir
     outDir = self.outDir
+    fileOutName = self.fileOutName
 
-    nameMatch = open(os.path.join(outDir, 'sentrixMap.txt'), 'w')
+    nameMatch = open(os.path.join(outDir, fileOutName), 'w')
     manifest = BeadPoolManifest(bpm)
     input_gtc_list = [gtc for gtc in os.listdir(gtcDir) if gtc.endswith(".gtc")]
 
