@@ -12,7 +12,7 @@ Code to hack through, manipulate, and extract information from GTC files
 	* method: [createSampleSheet](https://github.com/tbrunetti/GThaCk/wiki/createSampleSheet_wiki)
 	* method: [getIntensities](https://github.com/tbrunetti/GThaCk/wiki/getIntensities_wiki)
 	* method: [sampleInformation](https://github.com/tbrunetti/GThaCk/wiki/sampleInformation_wiki)
-	* method: [query](https://github.com/tbrunetti/GThaCk/wiki/sampleInformation_wiki)
+	* method: [query](https://github.com/tbrunetti/GThaCk/wiki/query_wiki)
 
 ### Introduction and Overview
 -----------------------------
