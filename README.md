@@ -12,6 +12,7 @@ Code to hack through, manipulate, and extract information from GTC files
 	* method: [createSampleSheet](https://github.com/tbrunetti/GThaCk/wiki/createSampleSheet_wiki)
 	* method: [getIntensities](https://github.com/tbrunetti/GThaCk/wiki/getIntensities_wiki)
 	* method: [sampleInformation](https://github.com/tbrunetti/GThaCk/wiki/sampleInformation_wiki)
+	* method: [query](https://github.com/tbrunetti/GThaCk/wiki/sampleInformation_wiki)
 
 ### Introduction and Overview
 -----------------------------
@@ -22,7 +23,9 @@ GThaCk is a program that allows users to extract all data contained a gtc file w
 ------------------------------------------
 *  Python >=3.6
 *  numpy  
-*  pandas  
+*  pandas
+*  matplotlib (for method: sampleInformation) 
+*  seaborn  (for method: sampleInformation)
 *  IlluminaBeadArrayFiles
 	--note: This is the base of Illumina code forked from ..... however, I have modified it to be compatible with Python version 3.6 and updated the code with some updates to be compatible with GThaCk
 
