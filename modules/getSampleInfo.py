@@ -48,48 +48,48 @@ def reportSampleInfo(self):
 
     summaryData['sampleGroup'] = "samples"
 
-    mean = summaryData['callRate'].mean()
-    upperStdSix = mean + (summaryData['callRate'].std()*6)
-    lowerStdSix = mean - (summaryData['callRate'].std()*6)
-    upperStdThree = mean + (summaryData['callRate'].std()*3)
-    lowerStdThree = mean - (summaryData['callRate'].std()*3)
+    images = ['callRate', 'gc10', 'logrDev']
+    for i in images:
+        mean = summaryData[i].mean()
+        upperStdSix = mean + (summaryData[i].std()*6)
+        lowerStdSix = mean - (summaryData[i].std()*6)
+        upperStdThree = mean + (summaryData[i].std()*3)
+        lowerStdThree = mean - (summaryData[i].std()*3)
 
-    removeOutliers = summaryData.loc[(summaryData['callRate'].astype(float) > lowerStdThree) & 
-        (summaryData['callRate'].astype(float) < upperStdThree)]
+        removeOutliers = summaryData.loc[(summaryData[i].astype(float) > lowerStdThree) & 
+            (summaryData[i].astype(float) < upperStdThree)]
 
-    fig, axs = plt.subplots(ncols=3)
+        fig, axs = plt.subplots(ncols=3)
 
-    sns.boxplot(x='sampleGroup', y='callRate', data = summaryData, showfliers=False, color='white', ax=axs[0])
-    sns.stripplot(x='sampleGroup', y='callRate', data = summaryData, hue='sex', palette="colorblind", ax=axs[0]).set_title('call rate across all samples', fontsize=10)
-    axs[0].set_yticklabels(np.round(axs[0].get_yticks(),3), size = 8)
+        sns.boxplot(x='sampleGroup', y=i, data = summaryData, showfliers=False, color='white', ax=axs[0])
+        sns.stripplot(x='sampleGroup', y=i, data = summaryData, hue='sex', palette="colorblind", ax=axs[0]).set_title(str(i) + ' across all samples', fontsize=10)
+        axs[0].set_yticklabels(np.round(axs[0].get_yticks(),3), size = 8)
 
-    callRatePlotDevs = sns.boxplot(x='sampleGroup', y='callRate', data = summaryData, showfliers=False, color='white', ax=axs[1])
-    callRatePlotDevs = sns.stripplot(x='sampleGroup', y='callRate', hue='sex', data = summaryData, palette="colorblind", ax=axs[1])
-    axs[1].set_ylabel('')
-    axs[1].set_yticklabels(np.round(axs[1].get_yticks(),3), size = 8) 
-    axs[1].legend_.remove()
-    callRatePlotDevs.axhline(upperStdThree, ls='--', color='blue')
-    callRatePlotDevs.axhline(lowerStdThree, ls='--', color='blue')
-    callRatePlotDevs.axhline(upperStdSix, ls=':', color='orange')
-    callRatePlotDevs.axhline(lowerStdSix, ls=':', color='orange')
-    callRatePlotDevs.axhline(mean, ls='-.', color = 'green', linewidth=2)
-    callRatePlotDevs.set_title('call rate across all samples \n annotated mean and std devs', fontsize=10)
+        plotDevs = sns.boxplot(x='sampleGroup', y=i, data = summaryData, showfliers=False, color='white', ax=axs[1])
+        plotDevs = sns.stripplot(x='sampleGroup', y=i, hue='sex', data = summaryData, palette="colorblind", ax=axs[1])
+        axs[1].set_ylabel('')
+        axs[1].legend_.remove()
+        plotDevs.axhline(upperStdThree, ls='--', color='blue')
+        plotDevs.axhline(lowerStdThree, ls='--', color='blue')
+        plotDevs.axhline(upperStdSix, ls=':', color='orange')
+        plotDevs.axhline(lowerStdSix, ls=':', color='orange')
+        plotDevs.axhline(mean, ls='-.', color = 'green', linewidth=2)
+        plotDevs.set_title(str(i) + ' across all samples \n annotated mean and std devs', fontsize=10)
+        axs[1].set_yticklabels(np.round(axs[1].get_yticks(),3), size = 8) 
 
+        sns.boxplot(x='sampleGroup', y=i, data = removeOutliers, showfliers=False, color='white', ax=axs[2])
+        sns.stripplot(x='sampleGroup', y=i, data = removeOutliers, hue='sex', palette="colorblind", ax=axs[2]).set_title(str(i) + ' across all samples \n with < 3 std devs from mean', fontsize=10)
+        axs[2].set_ylabel('')
+        axs[2].set_yticklabels(np.round(axs[2].get_yticks(), 3), size = 8) 
 
-    sns.boxplot(x='sampleGroup', y='callRate', data = removeOutliers, showfliers=False, color='white', ax=axs[2])
-    sns.stripplot(x='sampleGroup', y='callRate', data = removeOutliers, hue='sex', palette="colorblind", ax=axs[2]).set_title('call rate across all samples \n with < 3 std devs from mean', fontsize=10)
-    axs[2].set_ylabel('')
-    axs[2].set_yticklabels(np.round(axs[2].get_yticks(), 3), size = 8) 
+        axs[0].legend(loc=0)
+        axs[1].legend(loc=0)
+        axs[2].legend(loc=0)
+        plt.setp(axs)
 
-    axs[0].legend(loc=0)
-    axs[1].legend(loc=0)
-    axs[2].legend(loc=0)
-    plt.setp(axs)
-    #plt.tight_layout()
-    #plt.show()  
-    #figure = fig.get_figure()
-    #plt.tight_layout()
-    fig.set_size_inches(11, 7)
-    fig.savefig("callRatePlots.png")
-  
+        fig.set_size_inches(11, 7)
+        fig.savefig(str(i)+"Plots.png")
+
+        del removeOutliers
+      
     
