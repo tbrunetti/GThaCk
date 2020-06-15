@@ -54,13 +54,14 @@ class GtcFunctions:
         getSampleInfo.reportSampleInfo(self)
 
  
-    def getIntensities(self):
+    def getIntensities(self, fileOutName, prefix):
         import getIntensities
 
         logger = logging.getLogger('getIntensities')
         logger.debug('Running module: getIntensities')
         print('Running module: getIntensities')
-
+        self.fileOutName = fileOutName
+        self.prefix = prefix
         getIntensities.getIntensities(self)
     
     
@@ -196,8 +197,10 @@ if __name__ == '__main__':
 
     elif args.method == 'getIntensities':
         logger.info('method getIntensities selected \n creating new object of class GtcFunctions')
+        if args.fileOutName == None:
+            args.fileOutName = 'controlProbeIntensityValues.txt'
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
-        analysisObj.getIntensities()
+        analysisObj.getIntensities(args.fileOutName, args.prefix)
     
     elif args.method == 'sampleInformation':
         logger.info('method sampleInformation selected \n creating new object of class GtcFunctions')
