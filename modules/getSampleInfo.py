@@ -18,6 +18,10 @@ def reportSampleInfo(self):
     gtcDir = self.gtcDir
     outDir = self.outDir
     fileOutName = self.fileOutName
+    if self.prefix != '':
+        prefix = self.prefix + "_"
+    else:
+        prefix = self.prefix
 
     nameMatch = open(os.path.join(outDir, fileOutName), 'w')
     manifest = BeadPoolManifest(bpm)
@@ -88,7 +92,7 @@ def reportSampleInfo(self):
         plt.setp(axs)
 
         fig.set_size_inches(11, 7)
-        fig.savefig(str(i)+"Plots.png")
+        fig.savefig(prefix + str(i)+"Plots.png")
 
         del removeOutliers
       
