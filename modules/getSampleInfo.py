@@ -67,7 +67,8 @@ def reportSampleInfo(self):
 
         sns.boxplot(x='sampleGroup', y=i, data = summaryData, showfliers=False, color='white', ax=axs[0])
         sns.stripplot(x='sampleGroup', y=i, data = summaryData, hue='sex', palette="colorblind", ax=axs[0]).set_title(str(i) + ' across all samples', fontsize=10)
-        axs[0].set_yticklabels(np.round(axs[0].get_yticks(),3), size = 8)
+        axs[0].tick_params(axis='y', which='major', labelsize=8)
+
 
         plotDevs = sns.boxplot(x='sampleGroup', y=i, data = summaryData, showfliers=False, color='white', ax=axs[1])
         plotDevs = sns.stripplot(x='sampleGroup', y=i, hue='sex', data = summaryData, palette="colorblind", ax=axs[1])
@@ -79,12 +80,13 @@ def reportSampleInfo(self):
         plotDevs.axhline(lowerStdSix, ls=':', color='orange')
         plotDevs.axhline(mean, ls='-.', color = 'green', linewidth=2)
         plotDevs.set_title(str(i) + ' across all samples \n annotated mean and std devs', fontsize=10)
-        axs[1].set_yticklabels(np.round(axs[1].get_yticks(),3), size = 8) 
+        axs[1].tick_params(axis='y', which='major', labelsize=8)
+
 
         sns.boxplot(x='sampleGroup', y=i, data = removeOutliers, showfliers=False, color='white', ax=axs[2])
         sns.stripplot(x='sampleGroup', y=i, data = removeOutliers, hue='sex', palette="colorblind", ax=axs[2]).set_title(str(i) + ' across all samples \n with < 3 std devs from mean', fontsize=10)
         axs[2].set_ylabel('')
-        axs[2].set_yticklabels(np.round(axs[2].get_yticks(), 3), size = 8) 
+        axs[2].tick_params(axis='y', which='major', labelsize=8)
 
         axs[0].legend(loc=0)
         axs[1].legend(loc=0)
