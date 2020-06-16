@@ -24,8 +24,8 @@ GThaCk is a program that allows users to extract all data contained a gtc file w
 *  Python >=3.6
 *  numpy  
 *  pandas
-*  matplotlib (for method: sampleInformation) 
-*  seaborn  (for method: sampleInformation)
+*  matplotlib (for methods: sampleInformation, getIntensities) 
+*  seaborn  (for methods: sampleInformation, getIntensities)
 *  IlluminaBeadArrayFiles
 	--note: This is the base of Illumina code forked from ..... however, I have modified it to be compatible with Python version 3.6 and updated the code with some updates to be compatible with GThaCk
 
