@@ -143,49 +143,52 @@ def baseData(self):
 
 	
 
-	def gtcProcessing(gtcFile, finalList):
-
-		print('Pre-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
+	def gtcProcessing(gtcFile, randMRN, randInstID, finalList):
+		import types
+		
+		#print('Pre-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
 		#all_objects_in_gtc = muppy.get_objects()
-		#print(summary.summarize(all_objects_in_gtc))
+		#subsetObjects = muppy.filter(all_objects_in_gtc, Type=types.MethodType)
+		#preProcess = summary.summarize(subsetObjects)
 		if gtcFile.endswith('.gtc'):
 			colValues = []
 			data = extractInformation.getGtcInfo(os.path.join(gtcDir, gtcFile))
 			if data[12].decode() in configParams['control_wells']:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=0, gtcMatchFile=gtcMatchData)
-				randomInstIDs.pop(0)
-				randomMrns.pop(0)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randInstID, 'mrn':randMRN}, exclude=0, gtcMatchFile=gtcMatchData)
 			elif gtcFile in configParams['exclude_gtcs']:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=1, gtcMatchFile=gtcMatchData)
-				randomInstIDs.pop(0)
-				randomMrns.pop(0)			
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randInstID, 'mrn':randMRN}, exclude=1, gtcMatchFile=gtcMatchData)			
 			elif len(sampleSheetUpdates.index) > 0:
 				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=sampleSheetUpdates.iloc[0].to_dict(), default=None, exclude=0, gtcMatchFile=gtcMatchData)
 				sampleSheetUpdates.drop(0, inplace=True)
 				sampleSheetUpdates.reset_index(drop=True, inplace=True)	
 			else:
-				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randomInstIDs[0], 'mrn':randomMrns[0]}, exclude=0, gtcMatchFile=gtcMatchData)
-				randomInstIDs.pop(0)
-				randomMrns.pop(0)
+				colValues = updateData(gtcFile=gtcFile, data=data, sampleSheetUpdates=None, default={'instID':randInstID, 'mrn':randMRN}, exclude=0, gtcMatchFile=gtcMatchData)
 				
 			singleSample = dict(zip(smplSheetcols, colValues))
-			print('Post-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
+			#print('Pre- vs Post-Processing Memory Leak Check for gtc {}:\n'.format(gtcFile))			
+			#all_objects_in_gtc = muppy.get_objects()
+			#subsetObjects = muppy.filter(all_objects_in_gtc, Type=types.MethodType)
+			#postProcess = summary.summarize(subsetObjects)
 			finalList.append(singleSample)
+			#print(summary.get_diff(preProcess, postProcess))
 
+	
 	dataManager = multiprocessing.Manager()
 	finalList = dataManager.list()
 	listOfJobs = []
 	for gtcFile in enumerate(glob.glob(os.path.join(gtcDir, "*.gtc"))):
-		print(gtcFile[1].split('/')[-1])
-		#processes = multiprocessing.Process(target =gtcProcessing, args=(gtcFile, finalList))
-		#listOfJobs.append(processes)
-		#processes.start()
+		randMRN = randomMrns[gtcFile[0]]
+		randInstID =  randomInstIDs[gtcFile[0]]
+		gtcFile = gtcFile[1].split('/')[-1]
+		processes = multiprocessing.Process(target = gtcProcessing, args=(gtcFile, randMRN, randInstID, finalList))
+		listOfJobs.append(processes)
+		processes.start()
 
-	#for eachJob in listOfJobs:
-	#	eachJob.join()
+	for eachJob in listOfJobs:
+		eachJob.join()
 
 	# convert a proxy list to normal list object for use in downstream code
-	#convertedList = [i for i in finalList]
+	convertedList = [i for i in finalList]
 
 	try:
 		assert len(sampleSheetUpdates.index) == 0
