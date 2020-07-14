@@ -57,7 +57,7 @@ class GtcFunctions:
             getSampleInfo.reportSampleInfo(self)
 
  
-    def getIntensities(self, fileOutName, prefix):
+    def getIntensities(self, fileOutName, prefix, flag):
         import getIntensities
 
         logger = logging.getLogger('getIntensities')
@@ -65,7 +65,10 @@ class GtcFunctions:
         print('Running module: getIntensities')
         self.fileOutName = fileOutName
         self.prefix = prefix
-        getIntensities.getIntensities(self)
+        if flag:
+            getIntensities.getIntensitiesRecursive(self)
+        else:
+            getIntensities.getIntensities(self)
     
     
     def getCallperSample(self):
@@ -142,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--logName', default='gtcFuncs.log', type=str, help='Name of log file to output, will be created in directory --outDir')
     parser.add_argument('--pseudoInstID', default='7000000000,9999999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select instrument ID.  Both integers must be 10 digits.')
     parser.add_argument('--pseudoMrn', default='2000000,7999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select MRN.  Both integers must be 7 digits.')
-    parser.add_argument('--recursive', action='store_true', help="if flag is set, gtc files will be found recursively from base --gtcDir")
+    parser.add_argument('--recursive', action='store_true', help="if flag is set, gtc files will be found recursively from base --gtcDir; only valid for methods: getIntensities and sampleInformation")
    
     # ONLY FOR allCombos if implemented
     parser.add_argument('--snpFile', default=None, type=str, help='A file with snpID followed by possible combinations and gene association')
@@ -204,7 +207,7 @@ if __name__ == '__main__':
         if args.fileOutName == None:
             args.fileOutName = 'controlProbeIntensityValues.txt'
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
-        analysisObj.getIntensities(args.fileOutName, args.prefix)
+        analysisObj.getIntensities(args.fileOutName, args.prefix, args.recursive)
     
     elif args.method == 'sampleInformation':
         logger.info('method sampleInformation selected \n creating new object of class GtcFunctions')
