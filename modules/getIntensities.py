@@ -15,6 +15,7 @@ def getIntensities(self):
     import seaborn as sns
     import matplotlib.pyplot as plt 
     import numpy as np
+    import sys
 
     gtcDir = self.gtcDir
     bpm = self.bpm
@@ -99,11 +100,11 @@ def getIntensities(self):
         plotDevs = sns.stripplot(x='sampleGroup', y=i, hue='sex', data = allIntensities_transpose, palette="colorblind", ax=axs[1])
         axs[1].set_ylabel('')
         axs[1].legend_.remove()
-        plotDevs.axhline(mean, ls='-.', color = 'green', linewidth=2)
         plotDevs.axhline(upperStdThree, ls='--', color='blue')
         plotDevs.axhline(lowerStdThree, ls='--', color='blue')
         plotDevs.axhline(upperStdSix, ls=':', color='orange')
         plotDevs.axhline(lowerStdSix, ls=':', color='orange')
+        plotDevs.axhline(mean, ls='-.', color = 'green', linewidth=2)
         axs[1].tick_params(axis='y', which='major', labelsize=8)
         plotDevs.set_title(str(i) + '\n across all samples \n annotated mean and std devs', fontsize=10)
         
