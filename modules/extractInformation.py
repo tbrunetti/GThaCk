@@ -132,7 +132,7 @@ def getGtcInfo(gtc):
     data[
         GenotypeCalls.
         _GenotypeCalls__ID_SNP_MANIFEST] = genotype_calls.get_snp_manifest(
-        )  # key:101 - name of cluster file used
+        )  # key:101 - name of bpm file used
     data[
         GenotypeCalls.
         _GenotypeCalls__ID_LOGR_RATIOS] = genotype_calls.get_logr_ratios(
