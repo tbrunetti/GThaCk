@@ -43,7 +43,7 @@ class GtcFunctions:
         sampleSheet.generateSampleSheet(outDir = self.outDir, fileName = fileOutName)
 
 
-    def extractSampleInfo(self, fileOutName, prefix):
+    def extractSampleInfo(self, fileOutName, prefix, flag):
         import getSampleInfo
         
         logger = logging.getLogger('extractSampleInfo')
@@ -51,7 +51,10 @@ class GtcFunctions:
         print('Running module: extractSampleInfo')
         self.fileOutName = fileOutName
         self.prefix = prefix
-        getSampleInfo.reportSampleInfo(self)
+        if flag:
+            getSampleInfo.reportSampleInfoRecursive(self)
+        else:
+            getSampleInfo.reportSampleInfo(self)
 
  
     def getIntensities(self, fileOutName, prefix):
@@ -139,7 +142,8 @@ if __name__ == '__main__':
     parser.add_argument('--logName', default='gtcFuncs.log', type=str, help='Name of log file to output, will be created in directory --outDir')
     parser.add_argument('--pseudoInstID', default='7000000000,9999999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select instrument ID.  Both integers must be 10 digits.')
     parser.add_argument('--pseudoMrn', default='2000000,7999999', type=str, help='A comma-separated pair of 2 integers with the minimum and maximum range to select MRN.  Both integers must be 7 digits.')
-    
+    parser.add_argument('--recursive', action='store_true', help="if flag is set, gtc files will be found recursively from base --gtcDir")
+   
     # ONLY FOR allCombos if implemented
     parser.add_argument('--snpFile', default=None, type=str, help='A file with snpID followed by possible combinations and gene association')
  
@@ -207,7 +211,7 @@ if __name__ == '__main__':
         if args.fileOutName == None:
             args.fileOutName = 'allSampleInfo.txt'
         analysisObj = GtcFunctions(args.bpm, args.gtcDir, args.outDir)
-        analysisObj.extractSampleInfo(args.fileOutName, args.prefix)
+        analysisObj.extractSampleInfo(args.fileOutName, args.prefix, args.recursive)
     
     else:
         logger.critical('method {} does not exist!'.format(args.method))
