@@ -27,7 +27,7 @@ def reportSampleInfo(self):
     manifest = BeadPoolManifest(bpm)
     input_gtc_list = [gtc for gtc in os.listdir(gtcDir) if gtc.endswith(".gtc")]
 
-    header = ['BTID', 'plate', 'well', 'gtcName', 'sampleID', 'callRate', 'gc10', 'sex', 'logrDev']
+    header = ['BTID', 'plate', 'well', 'gtcName', 'sampleID', 'callRate', 'gc10', 'sex', 'logrDev', 'location']
     nameMatch.write('\t'.join(header) + '\n')
     
     for sampleGtc in input_gtc_list:
@@ -39,7 +39,7 @@ def reportSampleInfo(self):
                 sampleGtc + '\t' +
                 '{}-{}-{}'.format(names[11].decode(), names[12].decode(), names[10].decode()) + 
                 '\t' + str(names[1006]) + '\t' + str(names[1009]) + '\t' +
-                str(names[1007].decode()) + '\t' + str(names[1008]) + '\n')
+                str(names[1007].decode()) + '\t' + str(names[1008]) + '\t' + gtcDir + '\n')
 
         except AssertionError:
             print("Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.".format(
