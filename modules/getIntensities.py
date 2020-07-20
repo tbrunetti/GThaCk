@@ -17,6 +17,8 @@ def getIntensities(self):
     import numpy as np
     import sys
 
+    logging.getLogger('getIntensities')
+
     gtcDir = self.gtcDir
     bpm = self.bpm
     outDir = self.outDir
@@ -62,6 +64,7 @@ def getIntensities(self):
         except AssertionError:
             print("Sample {}, {} does not have a matching bpm for the manifest you are supplying. Skipping sample.".format(data[10], gtc))
             sys.stdout.flush()
+            logger.warning("Sample {}, {} does not have a matching bpm for the manifest you are supplying. Skipping sample.".format(data[10], gtc))
             continue
             
 
@@ -135,6 +138,8 @@ def getIntensitiesRecursive(self):
     from pathlib import Path
     from os import fspath
 
+    logger.getLogger('getIntensitiesRecursive')
+
     gtcDir = self.gtcDir
     bpm = self.bpm
     outDir = self.outDir
@@ -177,6 +182,7 @@ def getIntensitiesRecursive(self):
         except AssertionError:
             print("Sample {}, {} does not have a matching bpm for the manifest you are supplying. Skipping sample.".format(data[10], gtc))
             sys.stdout.flush()
+            logger.warning("Sample {}, {} does not have a matching bpm for the manifest you are supplying. Skipping sample.".format(data[10], gtc))
             continue
             
 

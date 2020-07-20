@@ -13,6 +13,9 @@ output:
 '''
 def reportSampleInfo(self):
     import extractInformation
+    import logging
+
+    logger = logging.getLogger('reportSampleInfo')
 
     bpm = self.bpm
     gtcDir = self.gtcDir
@@ -43,6 +46,8 @@ def reportSampleInfo(self):
 
         except AssertionError:
             print("Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.".format(
+             names[10], sampleGtc, names[101])) 
+            logger.warning('Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.'.format(
              names[10], sampleGtc, names[101]))
 
     nameMatch.flush()
@@ -126,7 +131,9 @@ def reportSampleInfoRecursive(self):
     import extractInformation
     from pathlib import Path
     from os import fspath
+    import logging
 
+    logger = logging.getLogger('reportSampleInfoRecursive')
 
     bpm = self.bpm
     gtcDir = self.gtcDir
@@ -157,6 +164,8 @@ def reportSampleInfoRecursive(self):
 
         except AssertionError:
             print("Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.".format(
+             names[10], sampleGtc, names[101]))
+            logger.warning("Error, sample {} in gtc {} does not have matching manifest/bpm file. Sample manifest is listed as {}.  Skipping sample.".format(
              names[10], sampleGtc, names[101]))
 
     nameMatch.flush()
