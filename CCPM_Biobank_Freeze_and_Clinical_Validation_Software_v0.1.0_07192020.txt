@@ -1,0 +1,98 @@
+Bootstrap: debootstrap
+OSVersion: bionic
+MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+Include: apt
+
+%help
+	This container contains software for the CCPM biobank pertaining to biobank data qc, freeze generation, and gtc manipulations and validations. See documentation of packages at: https://github.com/tbrunetti/GThaCk and https://github.com/Illumina/GTCtoVCF
+
+%setup
+
+%post
+	echo "Installing all container dependencies!"
+	apt-get -y update
+	apt-get install -y software-properties-common
+	apt-get install -y gpgv gpgsm gnupg-l10n gnupg
+	apt-get -y install git
+	add-apt-repository universe
+	apt-get -y install libpcre2-8-0 libcurl4-openssl-dev
+	apt-get install -y build-essential zlib1g-dev libncurses5-dev  libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+	add-apt-repository ppa:deadsnakes/ppa
+	apt-get -y update
+	apt-get -y install autoconf
+	apt-get -y install automake
+	apt-get -y install libbz2-dev
+	apt-get -y install liblzma-dev
+	apt-get -y install libgsl0-dev
+	apt-get -y install perl
+	wget https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz
+	tar -zxvf cmake-3.15.2.tar.gz
+	cd cmake-3.15.2
+	./bootstrap
+	make
+	make install
+	apt-get -y install libssl1.1
+	apt-get -y install libxml2-dev
+	apt-get -y install python3
+	apt-get -y install python3-pip
+	apt-get -y install python3-dev
+	apt-get -y install 2to3
+	apt-get -y install python3-lib2to3
+	apt-get install python3-toolz
+	pip3 install cget
+	pip3 install numpy
+	pip3 install pandas
+	pip3 install matplotlib
+	pip3 install seaborn
+	pip3 install pysam
+	pip3 install pyvcf
+	pip3 install Cython
+	which python3
+	ln -s /usr/bin/python3 /usr/bin/python
+	export LC_ALL=C.UTF-8
+    	export LANG=C.UTF-8
+	apt-get -y update
+	cd /opt/
+        git clone https://github.com/samtools/htslib.git
+        cd /opt/htslib/
+        autoheader
+        autoconf -Wno-syntax
+        ./configure
+        make
+        make install
+	cd /opt/
+	git clone https://github.com/samtools/samtools.git
+	cd /opt/samtools/
+	autoheader
+	autoconf -Wno-syntax
+	./configure 
+	make
+	make install
+	cd /opt/
+	git clone git://github.com/samtools/bcftools.git 
+	cd bcftools
+	autoheader && autoconf && ./configure --enable-libgsl
+	make
+	make install
+	cd /opt/
+	git clone https://github.com/tbrunetti/GThaCk.git
+	cd /opt/GThaCk/modules
+	mv IlluminaBeadArrayFiles.tar.gz /usr/local/lib/python3.6/dist-packages/
+	cd /usr/local/lib/python3.6/dist-packages/
+	tar -zxvf IlluminaBeadArrayFiles.tar.gz
+	cd /opt/
+	git clone https://github.com/Illumina/GTCtoVCF.git
+	cd /opt/GTCtoVCF/scripts
+	./download_reference.sh 37
+	./download_reference.sh 38
+
+%files
+
+%environment
+	export NETCDF_INCLUDE=/usr/include
+	export PATH="${PATH}:/mnt:/opt/GTCtoVCF:/opt/:/opt/GThaCk/:/usr/bin:/bin:/usr/local/sbin/:/usr/local/bin"
+        export PYTHONPATH="${PYTHONPATH}:/mnt/:/opt/"
+        export PYTHONPATH="${PYTHONPATH}:/usr/local/bin/:/usr/local/lib/python3.6/dist-packages/:/usr/local/lib/python3.6/:/usr/bin/"
+
+%runscript
+	exec "$@"	
